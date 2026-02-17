@@ -1,0 +1,26 @@
+{
+  "DNN": {
+    "accuracy": 0.375,
+    "precision": 0.2493,
+    "recall": 0.375,
+    "f1_score": 0.2848,
+    "cv_accuracy_mean": 0.4,
+    "cv_accuracy_std": 0.0565
+  },
+  "CNN_1D": {
+    "accuracy": 0.375,
+    "precision": 0.3429,
+    "recall": 0.375,
+    "f1_score": 0.3476,
+    "cv_accuracy_mean": 0.4417,
+    "cv_accuracy_std": 0.0858
+  },
+  "LSTM": {
+    "accuracy": 0.3333,
+    "precision": 0.2738,
+    "recall": 0.3333,
+    "f1_score": 0.2821,
+    "cv_accuracy_mean": 0.375,
+    "cv_accuracy_std": 0.0589
+  }
+}
