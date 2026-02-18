@@ -2,10 +2,8 @@ numpy
 pandas
 scikit-learn
 tensorflow
-fastapi
-uvicorn[standard]
-jinja2
-python-multipart
+streamlit
 joblib
 matplotlib
 seaborn
+torch
