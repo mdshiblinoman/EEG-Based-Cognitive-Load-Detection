@@ -21,7 +21,7 @@ try:
 except ImportError:
     TORCH_AVAILABLE = False
 
-# ── Paths ──────────────────────────────────────────────────────────────────
+#   Paths 
 ROOT = Path(__file__).parent
 MODEL_DIR = ROOT / "models"
 STATIC_DIR = ROOT / "static"
@@ -34,7 +34,7 @@ STRESS_MAP = {0: "Natural", 1: "Low-Level", 2: "Mid-Level", 3: "High-Level"}
 STRESS_COLORS = {"Natural": "#2ecc71", "Low-Level": "#f1c40f", "Mid-Level": "#e67e22", "High-Level": "#e74c3c"}
 
 
-# ── DL Model Definitions (must match training) ────────────────────────────
+# DL Model Definitions (must match training)
 if TORCH_AVAILABLE:
     class DNN(nn.Module):
         def __init__(self, n_features, n_classes=4):
@@ -83,7 +83,7 @@ if TORCH_AVAILABLE:
             return self.fc(out[:, -1, :])
 
 
-# ── Helper loaders (cached) ───────────────────────────────────────────────
+# Helper loaders (cached)
 @st.cache_data
 def load_dataset():
     if DATA_PATH.exists():
@@ -133,7 +133,7 @@ def load_dl_model(name, n_features):
     return model
 
 
-# ── Page config ────────────────────────────────────────────────────────────
+# Page config
 st.set_page_config(
     page_title="EEG Cognitive Load Detection",
     page_icon="🧠",
@@ -141,7 +141,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── Sidebar Navigation ────────────────────────────────────────────────────
+# Sidebar Navigation
 st.sidebar.title("🧠 EEG Stress Detection")
 st.sidebar.markdown("---")
 page = st.sidebar.radio(
@@ -152,10 +152,7 @@ page = st.sidebar.radio(
 st.sidebar.markdown("---")
 st.sidebar.info("EEG-Based Cognitive Load Detection using ML & DL models.")
 
-
-# ══════════════════════════════════════════════════════════════════════════
 #  PAGE: OVERVIEW
-# ══════════════════════════════════════════════════════════════════════════
 if page == "🏠 Overview":
     st.title("🧠 EEG-Based Cognitive Load Detection")
     st.markdown(
@@ -198,10 +195,7 @@ if page == "🏠 Overview":
         c3.metric("Tasks", df["task"].nunique())
         c4.metric("Stress Levels", df["stress_level"].nunique())
 
-
-# ══════════════════════════════════════════════════════════════════════════
 #  PAGE: DATA EXPLORER
-# ══════════════════════════════════════════════════════════════════════════
 elif page == "📊 Data Explorer":
     st.title("📊 Data Explorer")
     df = load_dataset()
@@ -210,7 +204,7 @@ elif page == "📊 Data Explorer":
         st.error("Processed dataset not found. Run `data_preprocessing.py` first.")
         st.stop()
 
-    # ── Dataset overview ───────────────────────────────────────────────
+    # Dataset overview
     st.subheader("Dataset Preview")
     st.dataframe(df.head(20), use_container_width=True)
 
@@ -218,7 +212,7 @@ elif page == "📊 Data Explorer":
 
     col1, col2 = st.columns(2)
 
-    # ── Stress distribution ────────────────────────────────────────────
+    # Stress distribution
     with col1:
         st.subheader("Stress Level Distribution")
         stress_counts = df["stress_label"].value_counts()
@@ -239,7 +233,7 @@ elif page == "📊 Data Explorer":
         st.pyplot(fig)
         plt.close(fig)
 
-    # ── Task distribution ──────────────────────────────────────────────
+    # Task distribution
     with col2:
         st.subheader("Task Distribution")
         task_counts = df["task"].value_counts()
@@ -255,7 +249,7 @@ elif page == "📊 Data Explorer":
 
     st.markdown("---")
 
-    # ── Feature distributions ──────────────────────────────────────────
+    # Feature distributions
     st.subheader("Feature Distribution Explorer")
     exclude = {"task", "stress_level", "stress_label", "participant"}
     feature_cols = [c for c in df.columns if c not in exclude]
@@ -286,7 +280,7 @@ elif page == "📊 Data Explorer":
 
     st.markdown("---")
 
-    # ── Correlation heatmap (top features) ─────────────────────────────
+    # Correlation heatmap (top features)
     st.subheader("Feature Correlation Heatmap (Top 15 by variance)")
     top_feats = df[feature_cols].var().nlargest(15).index.tolist()
     corr = df[top_feats].corr()
@@ -298,14 +292,11 @@ elif page == "📊 Data Explorer":
     st.pyplot(fig)
     plt.close(fig)
 
-    # ── Descriptive statistics ─────────────────────────────────────────
+    # Descriptive statistics
     st.subheader("Descriptive Statistics")
     st.dataframe(df[feature_cols].describe().T, use_container_width=True)
 
-
-# ══════════════════════════════════════════════════════════════════════════
 #  PAGE: ML RESULTS
-# ══════════════════════════════════════════════════════════════════════════
 elif page == "🤖 ML Results":
     st.title("🤖 Machine Learning Results")
 
@@ -319,7 +310,7 @@ elif page == "🤖 ML Results":
         st.info("Once trained, this page will show: comparison charts, confusion matrices, and per-model metrics.")
         st.stop()
 
-    # ── Results table ──────────────────────────────────────────────────
+    # Results table
     st.subheader("📊 Model Performance Comparison")
     res_df = pd.DataFrame(ml_results).T
     res_df.index.name = "Model"
@@ -330,7 +321,7 @@ elif page == "🤖 ML Results":
         use_container_width=True,
     )
 
-    # ── Bar chart ──────────────────────────────────────────────────────
+    # Bar chart
     st.subheader("📈 Metrics Comparison")
     metrics_to_show = st.multiselect(
         "Select metrics to compare:",
@@ -350,7 +341,7 @@ elif page == "🤖 ML Results":
         st.pyplot(fig)
         plt.close(fig)
 
-    # ── Confusion matrices ─────────────────────────────────────────────
+    # Confusion matrices
     st.markdown("---")
     st.subheader("📉 Confusion Matrices")
 
@@ -366,7 +357,7 @@ elif page == "🤖 ML Results":
             else:
                 st.caption(f"No confusion matrix image for {name}")
 
-    # ── ML comparison chart (if saved) ─────────────────────────────────
+    # ML comparison chart (if saved)
     ml_comp_path = STATIC_DIR / "ml_comparison.png"
     if ml_comp_path.exists():
         st.markdown("---")
@@ -374,9 +365,7 @@ elif page == "🤖 ML Results":
         st.image(str(ml_comp_path), use_container_width=True)
 
 
-# ══════════════════════════════════════════════════════════════════════════
 #  PAGE: DL RESULTS
-# ══════════════════════════════════════════════════════════════════════════
 elif page == "🧬 DL Results":
     st.title("🧬 Deep Learning Results")
 
@@ -389,7 +378,7 @@ elif page == "🧬 DL Results":
         )
         st.stop()
 
-    # ── Results table ──────────────────────────────────────────────────
+    # Results table
     st.subheader("📊 Model Performance Comparison")
     res_df = pd.DataFrame(dl_results).T
     res_df.index.name = "Model"
@@ -401,7 +390,7 @@ elif page == "🧬 DL Results":
         use_container_width=True,
     )
 
-    # ── Bar chart ──────────────────────────────────────────────────────
+    # Bar chart
     st.subheader("📈 Metrics Comparison")
     available_metrics = [c for c in res_df.columns if "std" not in c]
     metrics_to_show = st.multiselect(
@@ -422,7 +411,7 @@ elif page == "🧬 DL Results":
         st.pyplot(fig)
         plt.close(fig)
 
-    # ── Saved comparison chart ─────────────────────────────────────────
+    # Saved comparison chart
     dl_comp = STATIC_DIR / "dl_comparison.png"
     if dl_comp.exists():
         st.markdown("---")
@@ -431,7 +420,7 @@ elif page == "🧬 DL Results":
 
     st.markdown("---")
 
-    # ── Confusion matrices ─────────────────────────────────────────────
+    # Confusion matrices
     st.subheader("📉 Confusion Matrices")
     dl_model_names = list(dl_results.keys())
     cm_cols = st.columns(len(dl_model_names))
@@ -444,7 +433,7 @@ elif page == "🧬 DL Results":
             else:
                 st.caption(f"No confusion matrix for {name}")
 
-    # ── Training history ───────────────────────────────────────────────
+    # Training history
     st.markdown("---")
     st.subheader("📈 Training History")
     hist_cols = st.columns(len(dl_model_names))
@@ -458,9 +447,7 @@ elif page == "🧬 DL Results":
                 st.caption(f"No training history for {name}")
 
 
-# ══════════════════════════════════════════════════════════════════════════
 #  PAGE: PREDICT
-# ══════════════════════════════════════════════════════════════════════════
 elif page == "🔮 Predict":
     st.title("🔮 Stress Level Prediction")
     st.markdown("Upload an EEG recording file or manually input feature values to predict the stress level.")
@@ -470,7 +457,7 @@ elif page == "🔮 Predict":
         st.error("Scaler or feature columns not found. Train models first.")
         st.stop()
 
-    # ── Input method ───────────────────────────────────────────────────
+    # Input method
     input_method = st.radio("Choose input method:", ["📁 Upload EEG file (.txt)", "✏️ Manual feature input"], horizontal=True)
 
     input_features: np.ndarray | None = None
@@ -537,7 +524,7 @@ elif page == "🔮 Predict":
                 feat_values = np.array([manual_vals[c] for c in feature_cols]).reshape(1, -1)
                 input_features = scaler.transform(feat_values)
 
-    # ── Run prediction ─────────────────────────────────────────────────
+    # Run prediction 
     if input_features is not None:
         st.markdown("---")
         st.subheader("🎯 Prediction Results")
@@ -646,6 +633,6 @@ elif page == "🔮 Predict":
                     else:
                         st.info("This model does not provide probability estimates.")
 
-# ── Footer ─────────────────────────────────────────────────────────────────
+# Footer
 st.sidebar.markdown("---")
 st.sidebar.caption("Built with Streamlit • EEG Cognitive Load Detection")
